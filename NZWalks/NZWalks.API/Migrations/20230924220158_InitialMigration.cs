@@ -12,7 +12,7 @@ namespace NZWalks.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Region",
+                name: "Regions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -25,7 +25,7 @@ namespace NZWalks.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Region", x => x.Id);
+                    table.PrimaryKey("PK_Regions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -41,7 +41,7 @@ namespace NZWalks.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Walk",
+                name: "Walks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -52,15 +52,15 @@ namespace NZWalks.API.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Walk", x => x.Id);
+                    table.PrimaryKey("PK_Walks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Walk_Region_RegionId",
+                        name: "FK_Walks_Regions_RegionId",
                         column: x => x.RegionId,
-                        principalTable: "Region",
+                        principalTable: "Regions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Walk_WalkDifficulty_WalkDifficultyId",
+                        name: "FK_Walks_WalkDifficulty_WalkDifficultyId",
                         column: x => x.WalkDifficultyId,
                         principalTable: "WalkDifficulty",
                         principalColumn: "Id",
@@ -68,13 +68,13 @@ namespace NZWalks.API.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Walk_RegionId",
-                table: "Walk",
+                name: "IX_Walks_RegionId",
+                table: "Walks",
                 column: "RegionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Walk_WalkDifficultyId",
-                table: "Walk",
+                name: "IX_Walks_WalkDifficultyId",
+                table: "Walks",
                 column: "WalkDifficultyId");
         }
 
@@ -82,10 +82,10 @@ namespace NZWalks.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Walk");
+                name: "Walks");
 
             migrationBuilder.DropTable(
-                name: "Region");
+                name: "Regions");
 
             migrationBuilder.DropTable(
                 name: "WalkDifficulty");

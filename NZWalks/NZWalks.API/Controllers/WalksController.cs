@@ -20,8 +20,8 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> GetAllAsync()
         {
             var walks = await walkRepository.GetAllAsync();
-            var regionsDTO = mapper.Map<List<Models.DTO.Walk>>(walks);
-            return Ok(regionsDTO);
+            var walksDTO = mapper.Map<List<Models.DTO.Walk>>(walks);
+            return Ok(walksDTO);
         }
 
         [HttpGet]

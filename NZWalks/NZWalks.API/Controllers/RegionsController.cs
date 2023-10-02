@@ -14,17 +14,17 @@ namespace NZWalks.API.Controllers
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
 
-        public RegionsController(IRegionRepository regionRepository, IMapper mapper )
+        public RegionsController(IRegionRepository regionRepository, IMapper mapper)
         {
             this.regionRepository = regionRepository;
-            this.mapper=mapper;
+            this.mapper = mapper;
         }
         [HttpGet]
         public async Task<IActionResult> GetAllRegionsAsync()
         {
-           var regions= await regionRepository.GetAllAsync();
-           var regionsDTO=mapper.Map<List<Models.DTO.Region>>(regions);
-           return Ok(regionsDTO);
+            var regions = await regionRepository.GetAllAsync();
+            var regionsDTO = mapper.Map<List<Models.DTO.Region>>(regions);
+            return Ok(regionsDTO);
         }
 
         [HttpGet]
@@ -33,7 +33,7 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> GetRegionAsync(Guid Id)
         {
             var region = await regionRepository.GetAsync(Id);
-            if(region == null)
+            if (region == null)
             {
                 return NotFound();
             }
@@ -44,11 +44,15 @@ namespace NZWalks.API.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRegionAsync(AddRegionRequest addRegionRequest)
         {
-           var region=mapper.Map<Models.Domain.Region>(addRegionRequest);
-           region = await regionRepository.AddAsync(region);
+            //if(!ValidateAddRegionAsync(addRegionRequest))
+            //{
+            //    return BadRequest(ModelState);
+            //}
+            var region = mapper.Map<Models.Domain.Region>(addRegionRequest);
+            region = await regionRepository.AddAsync(region);
 
-           var regionDTO = mapper.Map<Models.DTO.Region>(region);
-           return CreatedAtAction(nameof(GetRegionAsync),new {id= regionDTO.Id}, regionDTO);
+            var regionDTO = mapper.Map<Models.DTO.Region>(region);
+            return CreatedAtAction(nameof(GetRegionAsync), new { id = regionDTO.Id }, regionDTO);
 
         }
         [HttpDelete]
@@ -60,7 +64,7 @@ namespace NZWalks.API.Controllers
             {
                 return NotFound();
             }
-            
+
 
             var regionDTO = mapper.Map<Models.DTO.Region>(region);
             return Ok(regionDTO);
@@ -69,17 +73,65 @@ namespace NZWalks.API.Controllers
 
         [HttpPut]
         [Route("{Id:guid}")]
-        public async Task<IActionResult> UpdateRegionAsync([FromRoute]Guid Id,[FromBody] Models.DTO.UpdateRegionRequest updateRegionRequest )
+        public async Task<IActionResult> UpdateRegionAsync([FromRoute] Guid Id, [FromBody] Models.DTO.UpdateRegionRequest updateRegionRequest)
         {
-            var region=mapper.Map<Models.Domain.Region>(updateRegionRequest);
+            var region = mapper.Map<Models.Domain.Region>(updateRegionRequest);
             region = await regionRepository.UpdateAsync(Id, region);
             if (region == null)
             {
                 return NotFound();
-            }          
-            region=await regionRepository.UpdateAsync(Id,region);
+            }
+            region = await regionRepository.UpdateAsync(Id, region);
             var regionDTO = mapper.Map<Models.DTO.Region>(region);
             return Ok(regionDTO);
         }
+
+        #region Private Methods
+        private bool ValidateAddRegionAsync(Models.DTO.AddRegionRequest addRegionRequest)
+        {
+            if (addRegionRequest==null)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest),
+                    $"Add Region Data is required");
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(addRegionRequest.Code))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Code),
+                    $"{nameof(addRegionRequest.Code)} should not be null or empty or whitespace");
+            }
+            if (string.IsNullOrWhiteSpace(addRegionRequest.Name))
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Name),
+                    $"{nameof(addRegionRequest.Name)} should not be null or empty or whitespace");
+            }
+            if (addRegionRequest.Area<=0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Area),
+                    $"{nameof(addRegionRequest.Area)} cannot be less than or equal to zero");
+            }
+            if (addRegionRequest.Lat <= 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Lat),
+                    $"{nameof(addRegionRequest.Lat)} cannot be less than or equal to zero");
+            }
+            if (addRegionRequest.Long <= 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Long),
+                    $"{nameof(addRegionRequest.Long)} cannot be less than or equal to zero");
+            }
+            if (addRegionRequest.Population < 0)
+            {
+                ModelState.AddModelError(nameof(addRegionRequest.Population),
+                    $"{nameof(addRegionRequest.Population)} cannot be less than  zero");
+            }
+
+            if(ModelState.ErrorCount > 0)
+            {
+                return false;
+            }
+            return true;
+        }
     }
 }
+        #endregion
